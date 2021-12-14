@@ -7,10 +7,14 @@ export default class TaintedPeter implements Character {
 
   public Load(player: EntityPlayer) {
     this.AddCostume(player);
+
+    // change the player's collision so it doesn't touch anything
   }
 
   private AddCostume(player: EntityPlayer) {
-    let costume: number = Isaac.GetCostumeIdByPath("gfx/characters/taintedPeter.anm2");
+    let costume: number = Isaac.GetCostumeIdByPath(
+      "gfx/characters/taintedPeter.anm2",
+    );
     player.AddNullCostume(costume);
   }
 }

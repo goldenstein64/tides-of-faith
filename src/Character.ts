@@ -1,5 +1,3 @@
 interface Character {
-  Load(player: EntityPlayer): void
-
-
+  Load(player: EntityPlayer): void;
 }

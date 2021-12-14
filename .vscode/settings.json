@@ -1,3 +1,4 @@
 {
-  "Lua.workspace.userThirdParty": []
+  "prettier.configPath": ".prettierrc.js",
+  "editor.formatOnSave": true
 }
