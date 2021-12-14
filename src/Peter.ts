@@ -3,7 +3,9 @@
 // );
 
 export default class Peter {
-  public static Load(player: EntityPlayer): void {
+  constructor(private mod: Mod) {}
+
+  Load(player: EntityPlayer): void {
     // player.AddNullCostume(COSTUME_ID);
 
     // change the player's collision so it doesn't touch pits

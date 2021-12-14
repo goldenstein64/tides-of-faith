@@ -1,3 +1,4 @@
+import Character from "./Character";
 import Peter from "./Peter";
 import TaintedPeter from "./TaintedPeter";
 
@@ -22,30 +23,30 @@ class TidesOfFaith {
   }
 
   private addCallbacks(): void {
-    this.mod.AddCallback(
-      ModCallbacks.MC_POST_PLAYER_INIT,
-      TidesOfFaith.postPlayerInit,
-    );
+    this.mod.AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, this.postPlayerInit);
     this.mod.AddCallback(
       ModCallbacks.MC_POST_GAME_STARTED,
-      TidesOfFaith.postGameStarted,
+      this.postGameStarted,
     );
   }
 
-  private static postPlayerInit(this: void, player: EntityPlayer): void {
+  private postPlayerInit(player: EntityPlayer): void {
+    let char: Character;
     switch (player.GetPlayerType()) {
       case PeterPlayerType:
-        Peter.Load(player);
+        char = new Peter(this.mod);
         break;
       case TaintedPeterPlayerType:
-        TaintedPeter.Load(player);
+        char = new TaintedPeter(this.mod);
         break;
       default:
-        break;
+        return;
     }
+
+    char.Load(player);
   }
 
-  private static postGameStarted(this: void): void {
+  private postGameStarted(): void {
     Isaac.DebugString("Callback triggered: MC_POST_GAME_STARTED");
   }
 }
