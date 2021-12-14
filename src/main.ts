@@ -1,4 +1,3 @@
-import Character from "./Character";
 import Peter from "./Peter";
 import TaintedPeter from "./TaintedPeter";
 
@@ -8,45 +7,45 @@ const PeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", false);
 const TaintedPeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", true);
 
 class TidesOfFaith {
-  private mod: Mod;
+  mod: Mod;
 
-  public constructor() {
+  constructor() {
     // Instantiate a new mod object, which grants the ability to add callback functions that
     // correspond to in-game events
     this.mod = RegisterMod(MOD_NAME, 1);
   }
 
-  public init(): void {
+  init(): void {
     this.addCallbacks();
 
     Isaac.DebugString(`${MOD_NAME} initialized.`);
   }
 
   private addCallbacks(): void {
-    this.mod.AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, this.postPlayerInit);
+    this.mod.AddCallback(
+      ModCallbacks.MC_POST_PLAYER_INIT,
+      TidesOfFaith.postPlayerInit,
+    );
     this.mod.AddCallback(
       ModCallbacks.MC_POST_GAME_STARTED,
-      this.postGameStarted,
+      TidesOfFaith.postGameStarted,
     );
   }
 
-  private postPlayerInit(player: EntityPlayer): void {
-    let char: Character;
+  private static postPlayerInit(this: void, player: EntityPlayer): void {
     switch (player.GetPlayerType()) {
       case PeterPlayerType:
-        char = new Peter();
+        Peter.Load(player);
         break;
       case TaintedPeterPlayerType:
-        char = new TaintedPeter();
+        TaintedPeter.Load(player);
         break;
       default:
-        return;
+        break;
     }
-
-    char.Load(player);
   }
 
-  private postGameStarted(): void {
+  private static postGameStarted(this: void): void {
     Isaac.DebugString("Callback triggered: MC_POST_GAME_STARTED");
   }
 }
