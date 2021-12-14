@@ -1,0 +1,19 @@
+{
+  "name": "tides-of-faith",
+  "version": "0.0.1",
+  "description": "A mod for The Binding of Isaac: Repentance",
+  "keywords": [
+    "isaac",
+    "mod",
+    "rebirth",
+    "afterbirth",
+    "repentance"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "isaac-typescript-definitions": "^1.0.308",
+    "isaacscript": "^1.1.58",
+    "isaacscript-common": "^1.0.559",
+    "isaacscript-lint": "^1.0.74"
+  }
+}
