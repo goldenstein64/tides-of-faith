@@ -1,16 +1,16 @@
-export default class Peter implements Character {
-  private mod: Mod;
+import Character from "./Character";
 
-  public constructor(mod: Mod) {
-    this.mod = mod;
-  }
+// const COSTUME_ID: number = Isaac.GetCostumeIdByPath(
+//   "gfx/characters/peter.anm2",
+// );
+
+export default class Peter implements Character {
+  public constructor() {}
 
   public Load(player: EntityPlayer): void {
-    this.AddCostume(player);
-  }
+    // player.AddNullCostume(COSTUME_ID);
 
-  private AddCostume(player: EntityPlayer): void {
-    let costume: number = Isaac.GetCostumeIdByPath("gfx/characters/peter.anm2");
-    player.AddNullCostume(costume);
+    // change the player's collision so it doesn't touch pits
+    player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_NOPITS;
   }
 }

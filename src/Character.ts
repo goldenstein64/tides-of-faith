@@ -1,3 +1,3 @@
-interface Character {
+export default interface Character {
   Load(player: EntityPlayer): void;
 }

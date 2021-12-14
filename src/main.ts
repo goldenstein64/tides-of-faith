@@ -1,3 +1,4 @@
+import Character from "./Character";
 import Peter from "./Peter";
 import TaintedPeter from "./TaintedPeter";
 
@@ -33,10 +34,10 @@ class TidesOfFaith {
     let char: Character;
     switch (player.GetPlayerType()) {
       case PeterPlayerType:
-        char = new Peter(this.mod);
+        char = new Peter();
         break;
       case TaintedPeterPlayerType:
-        char = new TaintedPeter(this.mod);
+        char = new TaintedPeter();
         break;
       default:
         return;

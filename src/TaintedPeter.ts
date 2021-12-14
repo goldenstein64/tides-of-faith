@@ -1,20 +1,16 @@
+import Character from "./Character";
+
+// const COSTUME_ID: number = Isaac.GetCostumeIdByPath(
+//   "gfx/characters/taintedPeter.anm2",
+// );
+
 export default class TaintedPeter implements Character {
-  private mod: Mod;
+  public constructor() {}
 
-  public constructor(mod: Mod) {
-    this.mod = mod;
-  }
-
-  public Load(player: EntityPlayer) {
-    this.AddCostume(player);
+  public Load(player: EntityPlayer): void {
+    // player.AddNullCostume(COSTUME_ID);
 
     // change the player's collision so it doesn't touch anything
-  }
-
-  private AddCostume(player: EntityPlayer) {
-    let costume: number = Isaac.GetCostumeIdByPath(
-      "gfx/characters/taintedPeter.anm2",
-    );
-    player.AddNullCostume(costume);
+    player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_WALLS;
   }
 }
