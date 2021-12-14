@@ -1,10 +1,10 @@
-import Peter from "./Peter"
-import TaintedPeter from "./TaintedPeter"
+import Peter from "./Peter";
+import TaintedPeter from "./TaintedPeter";
 
 const MOD_NAME = "Tides of Faith";
 
-const PeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", false)
-const TaintedPeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", true)
+const PeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", false);
+const TaintedPeterPlayerType: number = Isaac.GetPlayerTypeByName("Peter", true);
 
 class TidesOfFaith {
   private mod: Mod;
@@ -23,7 +23,10 @@ class TidesOfFaith {
 
   private addCallbacks(): void {
     this.mod.AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, this.postPlayerInit);
-    this.mod.AddCallback(ModCallbacks.MC_POST_GAME_STARTED, this.postGameStarted);
+    this.mod.AddCallback(
+      ModCallbacks.MC_POST_GAME_STARTED,
+      this.postGameStarted,
+    );
   }
 
   private postPlayerInit(player: EntityPlayer): void {
@@ -39,7 +42,7 @@ class TidesOfFaith {
         return;
     }
 
-    char.Load(player)
+    char.Load(player);
   }
 
   private postGameStarted(): void {
