@@ -1,3 +1,4 @@
+import { printConsole } from "isaacscript-common";
 import Character from "./Character";
 import Peter from "./Peter";
 import TaintedPeter from "./TaintedPeter";
@@ -19,14 +20,21 @@ class TidesOfFaith {
   init(): void {
     this.addCallbacks();
 
-    Isaac.DebugString(`${MOD_NAME} initialized.`);
+    printConsole(`${MOD_NAME} initialized.`);
   }
 
   private addCallbacks(): void {
-    this.mod.AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, this.postPlayerInit);
+    this.mod.AddCallback(
+      ModCallbacks.MC_POST_PLAYER_INIT,
+      (player: EntityPlayer) => {
+        this.postPlayerInit(player);
+      },
+    );
     this.mod.AddCallback(
       ModCallbacks.MC_POST_GAME_STARTED,
-      this.postGameStarted,
+      (isContinued: boolean) => {
+        this.postGameStarted();
+      },
     );
   }
 
@@ -47,7 +55,7 @@ class TidesOfFaith {
   }
 
   private postGameStarted(): void {
-    Isaac.DebugString("Callback triggered: MC_POST_GAME_STARTED");
+    printConsole("Callback triggered: MC_POST_GAME_STARTED");
   }
 }
 
