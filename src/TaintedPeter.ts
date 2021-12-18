@@ -1,8 +1,10 @@
 export default class TaintedPeter {
-  constructor(private mod: Mod) {}
+  constructor(private mod: Mod, private player: EntityPlayer) {}
 
-  Load(player: EntityPlayer): void {
+  Load(): void {
     // change the player's collision so it doesn't touch anything
-    player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_WALLS;
+    this.player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_WALLS;
   }
+
+  static PostPlayerUpdate(player: EntityPlayer) {}
 }

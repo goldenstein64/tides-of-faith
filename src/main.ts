@@ -42,16 +42,24 @@ class TidesOfFaith {
     let char: Character;
     switch (player.GetPlayerType()) {
       case PeterPlayerType:
-        char = new Peter(this.mod);
+        char = new Peter(this.mod, player);
+        this.mod.AddCallback(
+          ModCallbacks.MC_POST_PLAYER_UPDATE,
+          Peter.PostPlayerUpdate,
+        );
         break;
       case TaintedPeterPlayerType:
-        char = new TaintedPeter(this.mod);
+        char = new TaintedPeter(this.mod, player);
+        this.mod.AddCallback(
+          ModCallbacks.MC_POST_PLAYER_UPDATE,
+          TaintedPeter.PostPlayerUpdate,
+        );
         break;
       default:
         return;
     }
 
-    char.Load(player);
+    char.Load();
   }
 
   private postGameStarted(): void {
