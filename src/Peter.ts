@@ -1,5 +1,7 @@
 import { printConsole } from "isaacscript-common";
+import Character from "./Character";
 import * as CollisionObjects from "./CollisionObjects";
+type CollisionObject = CollisionObjects.CollisionObject;
 
 const PLAYERTYPE_PETER = Isaac.GetPlayerTypeByName("Peter", false);
 
@@ -15,20 +17,17 @@ const PITFALL_TIME: int = 60;
 const DAMAGE_ON_FALL = 1;
 const IFRAMES_ON_FALL: int = 120;
 
-declare type RoomConfig = Map<int, CollisionObjects.CollisionObject | null>;
-
-export default class Peter {
+export default class Peter implements Character {
   private isInPitfall = false;
   private stopCounter: int = 0;
   private fallCounter: int = 0;
 
-  private playerIndex: int;
+  private static addedStaticCallbacks = false;
+  private static pitCollisionObjects: Map<int, CollisionObject> = new Map();
 
-  constructor(private mod: Mod, private player: EntityPlayer) {
-    this.playerIndex = player.Index;
-  }
+  constructor(private mod: Mod, private player: EntityPlayer) {}
 
-  Load(): void {
+  AddCallbacks() {
     if (ID_PETERBUCKLE !== -1) {
       this.player.AddNullCostume(ID_PETERBUCKLE);
     } else {
@@ -41,67 +40,110 @@ export default class Peter {
       this.postPlayerUpdate,
     );
 
-    this.mod.RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM, Peter.postNewRoom);
-    this.mod.AddCallback(ModCallbacks.MC_POST_NEW_ROOM, Peter.postNewRoom);
+    if (Peter.addedStaticCallbacks) return;
+    Peter.addedStaticCallbacks = true;
+
+    CollisionObjects.init(this.mod);
+    this.mod.AddCallback(ModCallbacks.MC_POST_NEW_ROOM, this.PostNewRoom);
+    this.mod.AddCallback(ModCallbacks.MC_POST_UPDATE, this.PostUpdate);
+    this.mod.AddCallback(
+      ModCallbacks.MC_POST_GAME_END,
+      this.RemoveStaticCallbacks,
+    );
   }
 
-  private static postNewRoom = () => {
-    CollisionObjects.reset();
+  private RemoveStaticCallbacks = () => {
+    if (!Peter.addedStaticCallbacks) return;
+    Peter.addedStaticCallbacks = false;
 
+    CollisionObjects.cleanUp(this.mod);
+    this.mod.RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM, this.PostNewRoom);
+    this.mod.RemoveCallback(ModCallbacks.MC_POST_UPDATE, this.PostUpdate);
+  };
+
+  private PostNewRoom = () => {
     let room: Room = Game().GetRoom();
     let gridSize = room.GetGridSize();
+    Peter.pitCollisionObjects.clear();
     for (let i = 1; i <= gridSize; i++) {
       let gridEntity = room.GetGridEntity(i);
-      if (gridEntity === undefined) continue;
+      if (!gridEntity) continue;
 
       let gridType = gridEntity.GetType();
-      if (gridType === GridEntityType.GRID_PIT) {
-        gridEntity.CollisionClass =
-          GridCollisionClass.COLLISION_WALL_EXCEPT_PLAYER;
+      let existingCollObj = Peter.pitCollisionObjects.get(i);
+      if (gridType === GridEntityType.GRID_PIT && !existingCollObj) {
+        gridEntity.CollisionClass = GridCollisionClass.COLLISION_NONE;
 
-        CollisionObjects.setCollisionRect(
+        let collObj = CollisionObjects.setCollisionRect(
           gridEntity.Position.sub(TILE_RADIUS),
           gridEntity.Position.add(TILE_RADIUS),
           GridCollisionClass.COLLISION_PIT,
-          Peter.isPlayerAndNotPeter,
+          Peter.isNotPlayerOrNotPeter,
         );
+
+        Peter.pitCollisionObjects.set(i, collObj);
       }
     }
   };
 
-  private static isPlayerAndNotPeter = (
-    collObj: CollisionObjects.CollisionObject,
+  private PostUpdate = () => {
+    let room: Room = Game().GetRoom();
+    let gridSize = room.GetGridSize();
+    for (let i = 1; i <= gridSize; i++) {
+      let gridEntity = room.GetGridEntity(i);
+      if (!gridEntity) continue;
+
+      let hasPitCollision =
+        gridEntity.CollisionClass === GridCollisionClass.COLLISION_PIT;
+      let existingCollObj = Peter.pitCollisionObjects.get(i);
+      if (hasPitCollision && !existingCollObj) {
+        gridEntity.CollisionClass = GridCollisionClass.COLLISION_NONE;
+
+        let collObj = this.createPitCollisionObjectAt(gridEntity.Position);
+        Peter.pitCollisionObjects.set(i, collObj);
+      } else if (!hasPitCollision && existingCollObj) {
+        existingCollObj.Remove();
+        Peter.pitCollisionObjects.delete(i);
+      }
+    }
+  };
+
+  private createPitCollisionObjectAt(position: Vector) {
+    return CollisionObjects.setCollisionRect(
+      position.sub(TILE_RADIUS),
+      position.add(TILE_RADIUS),
+      GridCollisionClass.COLLISION_PIT,
+      Peter.isNotPlayerOrNotPeter,
+    );
+  }
+
+  private static isNotPlayerOrNotPeter = (
+    collObj: CollisionObject,
     ent: Entity,
   ) => {
     let player = ent.ToPlayer();
 
-    return player !== undefined && player.GetPlayerType() !== PLAYERTYPE_PETER;
+    return !player || player.GetPlayerType() !== PLAYERTYPE_PETER;
   };
 
-  static PostPlayerUpdate(player: EntityPlayer) {
-    CollisionObjects.entityGridCollisionUpdate(player);
-  }
-
   private postPlayerUpdate = (player: EntityPlayer) => {
-    CollisionObjects.entityGridCollisionUpdate(player);
-
     if (player.Index !== this.player.Index) return;
 
     if (!this.isInPitfall) {
-      this.whileWalkingOverPitfall();
+      this.whileWalking();
     } else {
-      this.whileFallingInPitfall();
+      this.whileInPitfall();
     }
   };
 
-  private whileWalkingOverPitfall() {
+  private whileWalking() {
     let movementInput = this.player.GetMovementInput();
     let gridEntity = Game()
       .GetRoom()
       .GetGridEntityFromPos(this.player.Position);
     let gridPit = gridEntity?.ToPit();
 
-    let isWalkingOverPit = gridPit !== undefined && !gridPit.HasLadder;
+    let isWalkingOverPit = gridPit && !gridPit.HasLadder;
 
     if (movementInput.LengthSquared() === 0 && isWalkingOverPit) {
       this.stopCounter += 1;
@@ -121,7 +163,7 @@ export default class Peter {
     }
   }
 
-  private whileFallingInPitfall() {
+  private whileInPitfall() {
     this.fallCounter += 1;
     if (this.fallCounter > PITFALL_TIME) {
       let nearestFreePosition = Isaac.GetFreeNearPosition(

@@ -89,4 +89,6 @@ export function entityGridCollisionUpdate(ent: Entity): void;
 
 export function init(mod: Mod): void;
 
+export function cleanUp(mod: Mod): void;
+
 export function reset(): void;

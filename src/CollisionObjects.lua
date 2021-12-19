@@ -374,6 +374,15 @@ function exports:init(mod)
 	end
 end
 
+function exports:cleanUp(mod)
+	mod:RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM, exports.reset)
+
+	local entityUpdateCallbacks = {"MC_NPC_UPDATE", "MC_POST_PICKUP_UPDATE", "MC_POST_PLAYER_UPDATE", "MC_POST_BOMB_UPDATE", "MC_POST_TEAR_UPDATE", "MC_POST_PROJECTILE_UPDATE"}
+	for _,callback in ipairs(entityUpdateCallbacks) do
+		mod:RemoveCallback(ModCallbacks[callback], exports.entityGridCollisionUpdate)
+	end
+end
+
 function exports:reset()
 	collisionObjects = {}
 	gridIndexToCollisionObjects = {}
