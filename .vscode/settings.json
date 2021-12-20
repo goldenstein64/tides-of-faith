@@ -1,4 +1,5 @@
 {
   "prettier.configPath": ".prettierrc.js",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "xml.format.preserveAttributeLineBreaks": true
 }

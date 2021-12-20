@@ -1,3 +1,13 @@
 <players root="gfx/characters/costumes/" portraitroot="gfx/ui/stage/" nameimageroot="gfx/ui/boss/">
-  <player name="Peter" skin="Character_Peter.png" hp="12" bombs="20" keys="10" nameimage="PlayerName_Peter.png" portrait="PlayerPortrait_Peter.png" skinColor="-1" birthright="#ISAAC_BIRTHRIGHT" />
+  <player
+    name="Peter"
+    skin="Character_Peter.png"
+    hp="12"
+    bombs="20"
+    keys="10"
+    nameimage="PlayerName_Peter.png"
+    portrait="PlayerPortrait_Peter.png"
+    skinColor="-1"
+    birthright="#ISAAC_BIRTHRIGHT"
+  />
 </players>

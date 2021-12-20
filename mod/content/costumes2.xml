@@ -1,3 +1,7 @@
 <costumes anm2root="gfx/characters/">
-  <costume anm2path="Costume_PeterBuckle.anm2" type="none" priority="99" />
+  <costume
+    anm2path="Costume_PeterBuckle.anm2"
+    type="none"
+    priority="99"
+  />
 </costumes>
