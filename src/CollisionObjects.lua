@@ -247,6 +247,10 @@ function exports:distanceFromNearestCollisionObject(pos)
 	end
 end
 
+local function clamp(value, min, max)
+	return math.min(math.max(value, min), max)
+end
+
 function exports:entityGridCollisionUpdate(ent)
 	if exports:areCollisionObjectsPresent() then
 		local data = ent:GetData()
@@ -262,12 +266,12 @@ function exports:entityGridCollisionUpdate(ent)
 			end
 		end
 
-		local entIdentifier = ent.Type == EntityType.ENTITY_TEAR and "TEAR"
-							or ent.Type == EntityType.ENTITY_PROJECTILE and "PROJECTILE"
-							or ent.Type == EntityType.ENTITY_PLAYER and "PLAYER"
-							or ent.Type == EntityType.ENTITY_PICKUP and "PICKUP"
-							or ent.Type == EntityType.ENTITY_BOMBDROP and "BOMB"
-							or "NPC"
+		-- local entIdentifier = ent.Type == EntityType.ENTITY_TEAR and "TEAR"
+		-- 					or ent.Type == EntityType.ENTITY_PROJECTILE and "PROJECTILE"
+		-- 					or ent.Type == EntityType.ENTITY_PLAYER and "PLAYER"
+		-- 					or ent.Type == EntityType.ENTITY_PICKUP and "PICKUP"
+		-- 					or ent.Type == EntityType.ENTITY_BOMBDROP and "BOMB"
+		-- 					or "NPC"
 	
 		local newTargetPos = ent.Position + ent.Velocity
 		local maxX, maxY, minX, minY = math.huge, math.huge, 0, 0
@@ -296,18 +300,18 @@ function exports:entityGridCollisionUpdate(ent)
 				if ent.Position.X == closestPoint.X and ent.Position.Y == closestPoint.Y then
 					if math.abs(scaledPosDiff.X) > math.abs(scaledPosDiff.Y)  then
 						if scaledPosDiff.X > 0 then
-							minX = math.min(math.max(minX, collObj.Vec2.X + ent.Size), maxX)
+							minX = clamp(collObj.Vec2.X + ent.Size, minX, maxX)
 							ent.Position = Vector(minX, ent.Position.Y)
 						else
-							maxX = math.min(math.max(minX, collObj.Vec1.X - ent.Size), maxX)
+							maxX = clamp(collObj.Vec1.X - ent.Size, minX, maxX)
 							ent.Position = Vector(maxX, ent.Position.Y)
 						end
 					else
 						if scaledPosDiff.Y > 0 then
-							minY = math.min(math.max(minY, collObj.Vec2.Y + ent.Size), maxY)
+							minY = clamp(collObj.Vec2.Y + ent.Size, minY, maxY)
 							ent.Position = Vector(ent.Position.X, minY)
 						else
-							maxY = math.min(math.max(minY, collObj.Vec1.Y - ent.Size), maxY)
+							maxY = clamp(collObj.Vec1.Y - ent.Size, minY, maxY)
 							ent.Position = Vector(ent.Position.X, maxY)
 						end
 					end
@@ -317,18 +321,42 @@ function exports:entityGridCollisionUpdate(ent)
 				elseif (ent.Position - closestPoint):LengthSquared() < ent.Size ^ 2 then
 					if math.abs(scaledPosDiff.X) > math.abs(scaledPosDiff.Y)  then
 						if scaledPosDiff.X > 0 then
-							minX = math.min(math.max(minX, math.min(collObj.Vec2.X + ent.Size, (closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).X)), maxX)
+							minX = clamp(
+								math.min(
+									collObj.Vec2.X + ent.Size, 
+									(closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).X
+								), 
+								minX, maxX
+							)
 							ent.Position = Vector(minX, ent.Position.Y)
 						else
-							maxX = math.min(math.max(minX, math.max(collObj.Vec1.X - ent.Size, (closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).X)), maxX)
+							maxX = clamp(
+								math.max(
+									collObj.Vec1.X - ent.Size, 
+									(closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).X
+								), 
+								minX, maxX
+							)
 							ent.Position = Vector(maxX, ent.Position.Y)
 						end
 					else
 						if scaledPosDiff.Y > 0 then
-							minY = math.min(math.max(minY, math.min(collObj.Vec2.Y + ent.Size, (closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).Y)), maxY)
+							minY = clamp(
+								math.min(
+									collObj.Vec2.Y + ent.Size, 
+									(closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).Y
+								), 
+								minY, maxY
+							)
 							ent.Position = Vector(ent.Position.X, minY)
 						else
-							maxY = math.min(math.max(minY, math.max(collObj.Vec1.Y - ent.Size, (closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).Y)), maxY)
+							maxY = clamp(
+								math.max(
+									collObj.Vec1.Y - ent.Size, 
+									(closestPoint + (ent.Position-closestPoint):Resized(ent.Size)).Y
+								), 
+								minY, maxY
+							)
 							ent.Position = Vector(ent.Position.X, maxY)
 						end
 					end
@@ -336,23 +364,50 @@ function exports:entityGridCollisionUpdate(ent)
 					data.CollidesWithCollisionObject = true
 				end
 				
-				local closestPointToTargetPos = Vector(math.min(math.max(newTargetPos.X, collObj.Vec1.X), collObj.Vec2.X), math.min(math.max(newTargetPos.Y, collObj.Vec1.Y), collObj.Vec2.Y))
+				local closestPointToTargetPos = Vector(
+					clamp(newTargetPos.X, collObj.Vec1.X, collObj.Vec2.X), 
+					clamp(newTargetPos.Y, collObj.Vec1.Y, collObj.Vec2.Y)
+				)
 				
 				if (newTargetPos - closestPointToTargetPos):LengthSquared() < ent.Size ^ 2 then
 					if math.abs(scaledPosDiff.X) > math.abs(scaledPosDiff.Y)  then
 						if scaledPosDiff.X > 0 then
-							minX = math.min(math.max(minX, math.min(collObj.Vec2.X + ent.Size, (closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).X)), maxX)
+							minX = clamp(
+								math.min(
+									collObj.Vec2.X + ent.Size, 
+									(closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).X
+								), 
+								minX, maxX
+							)
 							newTargetPos = Vector(minX, newTargetPos.Y)
 						else
-							maxX = math.min(math.max(minX, math.max(collObj.Vec1.X - ent.Size, (closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).X)), maxX)
+							maxX = clamp(
+								math.max(
+									collObj.Vec1.X - ent.Size, 
+									(closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).X
+								), 
+								minX, maxX
+							)
 							newTargetPos = Vector(maxX, newTargetPos.Y)
 						end
 					else
 						if scaledPosDiff.Y > 0 then
-							minY = math.min(math.max(minY, math.min(collObj.Vec2.Y + ent.Size, (closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).Y)), maxY)
+							minY = clamp(
+								math.min(
+									collObj.Vec2.Y + ent.Size, 
+									(closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).Y
+								), 
+								minY, maxY
+							)
 							newTargetPos = Vector(newTargetPos.X, minY)
 						else
-							maxY = math.min(math.max(minY, math.max(collObj.Vec1.Y - ent.Size, (closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).Y)), maxY)
+							maxY = clamp(
+								math.max(
+									collObj.Vec1.Y - ent.Size, 
+									(closestPointToTargetPos + (newTargetPos-closestPointToTargetPos):Resized(ent.Size)).Y
+								), 
+								minY, maxY
+							)
 							newTargetPos = Vector(newTargetPos.X, maxY)
 						end
 					end
@@ -365,10 +420,10 @@ function exports:entityGridCollisionUpdate(ent)
 	end
 end
 
+local entityUpdateCallbacks = {"MC_NPC_UPDATE", "MC_POST_PICKUP_UPDATE", "MC_POST_PLAYER_UPDATE", "MC_POST_BOMB_UPDATE", "MC_POST_TEAR_UPDATE", "MC_POST_PROJECTILE_UPDATE"}
 function exports:init(mod)
 	mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, exports.reset)
 
-	local entityUpdateCallbacks = {"MC_NPC_UPDATE", "MC_POST_PICKUP_UPDATE", "MC_POST_PLAYER_UPDATE", "MC_POST_BOMB_UPDATE", "MC_POST_TEAR_UPDATE", "MC_POST_PROJECTILE_UPDATE"}
 	for _,callback in ipairs(entityUpdateCallbacks) do
 		mod:AddCallback(ModCallbacks[callback], exports.entityGridCollisionUpdate)
 	end
@@ -376,8 +431,7 @@ end
 
 function exports:cleanUp(mod)
 	mod:RemoveCallback(ModCallbacks.MC_POST_NEW_ROOM, exports.reset)
-
-	local entityUpdateCallbacks = {"MC_NPC_UPDATE", "MC_POST_PICKUP_UPDATE", "MC_POST_PLAYER_UPDATE", "MC_POST_BOMB_UPDATE", "MC_POST_TEAR_UPDATE", "MC_POST_PROJECTILE_UPDATE"}
+	
 	for _,callback in ipairs(entityUpdateCallbacks) do
 		mod:RemoveCallback(ModCallbacks[callback], exports.entityGridCollisionUpdate)
 	end

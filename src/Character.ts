@@ -1,3 +1,3 @@
-export default interface Character {
-  AddCallbacks(): void;
-}
+import Loadable from "./Loadable";
+
+export default interface Character extends Loadable {}

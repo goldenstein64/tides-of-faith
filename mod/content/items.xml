@@ -1,0 +1,16 @@
+<items gfxroot="gfx/items/" version="1">
+  <active
+    name="Keys to the Kingdom"
+    description="Divine Control &amp; Strength in Salvation"
+    gfx="Item_KeysToTheKingdom.png"
+    maxcharges="8"
+    chargetype="special"
+    quality="4"
+  />
+  <trinket
+    name="Alabaster Scrap"
+    description=":)"
+    gfx="Item_AlabasterScrap.png"
+    cache="damage"
+  />
+</items>
