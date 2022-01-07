@@ -1,5 +1,14 @@
 {
   "prettier.configPath": ".prettierrc.js",
   "editor.formatOnSave": true,
-  "xml.format.preserveAttributeLineBreaks": true
+  "xml.format.preserveAttributeLineBreaks": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.maxTokenizationLineLength": 2500
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  }
 }

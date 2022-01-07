@@ -1,14 +1,15 @@
 import Character from "../Character";
 
+/**
+ * Represents the behavior of Tainted Peter
+ */
 export default class TaintedPeter implements Character {
-  [Symbol.toStringTag]: string = "TaintedPeter";
+  constructor(private player: EntityPlayer) {}
 
-  constructor(private mod: Mod, private player: EntityPlayer) {}
-
-  Load() {
+  Load(): void {
     // change the player's collision so it doesn't touch anything
     this.player.GridCollisionClass = EntityGridCollisionClass.GRIDCOLL_WALLS;
   }
 
-  Unload() {}
+  Unload(): void {}
 }
