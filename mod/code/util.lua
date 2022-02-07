@@ -13,7 +13,7 @@ end
 function util.getActiveEnemies()
 	local activeEnemies = {}
 	for _, entity in ipairs(Isaac.GetRoomEntities()) do
-		local npc = entity.ToNPC()
+		local npc = entity:ToNPC()
 
 		if npc and npc:IsActiveEnemy(false) then
 			table.insert(activeEnemies, npc)

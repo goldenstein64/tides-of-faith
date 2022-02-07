@@ -253,8 +253,6 @@ function KeysToTheKingdom.spareBoss(mod, player, boss)
     return
   end
 
-  KeysToTheKingdom.bossTimers[boss.Index] = SPARE_DURATION * 30
-
   local effect = Isaac.Spawn(
     EntityType.ENTITY_EFFECT,
     EffectVariant.HALLOWED_GROUND,
@@ -267,6 +265,9 @@ function KeysToTheKingdom.spareBoss(mod, player, boss)
   effect.LifeSpan = 1
   effect:FollowParent(boss)
 
+  KeysToTheKingdom.bossTimers[boss] = SPARE_DURATION * 30
+
+  -- if no boss timers exist,
   if not KeysToTheKingdom.bossTimersPresent then
     KeysToTheKingdom.bossTimersPresent = true
     mod:AddCallback(
@@ -277,11 +278,9 @@ function KeysToTheKingdom.spareBoss(mod, player, boss)
 end
 
 function KeysToTheKingdom.BossRoomPostUpdate(mod)
-  local entities = Isaac.GetRoomEntities()
-  for bossIndex, duration in pairs(KeysToTheKingdom.bossTimers) do
-    local boss = entities[bossIndex]
+  for boss, duration in pairs(KeysToTheKingdom.bossTimers) do
     duration = duration - 1
-    KeysToTheKingdom.bossTimers[bossIndex] = duration
+    KeysToTheKingdom.bossTimers[boss] = duration
     if duration <= 0 then
       Isaac.Spawn(
         EntityType.ENTITY_EFFECT,
@@ -293,7 +292,7 @@ function KeysToTheKingdom.BossRoomPostUpdate(mod)
       )
       boss:Remove()
 
-      KeysToTheKingdom.bossTimers[bossIndex] = nil
+      KeysToTheKingdom.bossTimers[boss] = nil
     end
   end
 
