@@ -26,8 +26,9 @@ end
 -- transcribed from:
 -- https://github.com/IsaacScript/isaacscript-common/blob/7fb8274a5a3892ab3805ca31af60e3cacce2ba56/src/functions/player.ts#L395
 function util.getPlayerIndex(player)
-	local character = player:GetPlayerType()
-	local collectibleToUse = character == PlayerType.PLAYER_LAZARUS_B and CollectibleType.COLLECTIBLE_INNER_EYE
+	local playerType = player:GetPlayerType()
+	local collectibleToUse = playerType == PlayerType.PLAYER_LAZARUS_B
+		and CollectibleType.COLLECTIBLE_INNER_EYE
 		or CollectibleType.COLLECTIBLE_SAD_ONION
 
 	local collectibleRNG = player:GetCollectibleRNG(collectibleToUse)
