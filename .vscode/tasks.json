@@ -11,9 +11,9 @@
         "isDefault": true
       },
       "command": "npx isaacscript",
-      "runOptions": {
-        "runOn": "folderOpen"
-      }
+      // "runOptions": {
+      //   "runOn": "folderOpen"
+      // }
     }
   ]
 }

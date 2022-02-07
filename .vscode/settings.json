@@ -9,6 +9,7 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
-  }
+    "editor.formatOnSave": true
+  },
+  "Lua.runtime.version": "Lua 5.3"
 }
