@@ -81,8 +81,8 @@ end
 ---@return integer
 function exports:getNumCollisionObjects()
 	local n = 0
-	local collisionObjects = exports.getCollisionObjects()
-	for i=1, exports.getNumCollisionObjectIds() do
+	local collisionObjects = exports:getCollisionObjects()
+	for i=1, exports:getNumCollisionObjectIds() do
 		if collisionObjects[i] then
 			n = n + 1
 		end
@@ -104,12 +104,12 @@ end
 ---collision objects with collObj.DontMerge = true ignore this
 ---@return nil
 function exports:mergeCollisionObjects()
-	local collisionObjects = exports.getCollisionObjects()
-	for i=1, exports.getNumCollisionObjectIds() do
+	local collisionObjects = exports:getCollisionObjects()
+	for i=1, exports:getNumCollisionObjectIds() do
 		local collObj = collisionObjects[i]
 		
 		if collObj and not collObj.DontMerge then
-			for i2=1, exports.getNumCollisionObjectIds() do
+			for i2=1, exports:getNumCollisionObjectIds() do
 				local collObj2 = collisionObjects[i2]
 				if collObj2 and not collObj2.DontMerge and collObj.CollisionClass == collObj2.CollisionClass and collObj.Conditions == collObj2.Conditions then
 					if collObj.Vec2.X == collObj2.Vec1.X and collObj.Vec1.Y == collObj2.Vec1.Y and (collObj.Vec2.Y-collObj.Vec1.Y) == (collObj2.Vec2.Y-collObj2.Vec1.Y)
@@ -134,8 +134,8 @@ end
 ---@param hasField boolean
 ---@return nil
 function exports:reconnectCollisionObjectConditions(conditions, hasField)
-	local collisionObjects = exports.getCollisionObjects()
-	for i=1, exports.getNumCollisionObjectIds() do
+	local collisionObjects = exports:getCollisionObjects()
+	for i=1, exports:getNumCollisionObjectIds() do
 		local collObj = collisionObjects[i]
 		if collObj and (not hasField or collObj[hasField]) then
 			collObj.Conditions = conditions
@@ -149,10 +149,10 @@ end
 ---@return nil
 function exports:assignGridIndicesToCollisionObjects()
 	local room = Game():GetRoom()
-	local collisionObjects = exports.getCollisionObjects()
+	local collisionObjects = exports:getCollisionObjects()
 	gridIndexToCollisionObjects = {}
 	
-	for i=1, exports.getNumCollisionObjectIds() do
+	for i=1, exports:getNumCollisionObjectIds() do
 		local collObj = collisionObjects[i]
 		
 		if collObj then
@@ -192,30 +192,30 @@ end
 
 ---whether the entity is currently colliding with a collObj
 function exports:collidesWithCollisionObject(ent)
-	return exports.areCollisionObjectsPresent() and not not ent:GetData().CollidesWithCollisionObject
+	return exports:areCollisionObjectsPresent() and not not ent:GetData().CollidesWithCollisionObject
 end
 
 ---whether the entity either currently collides with a vanilla grid or a 
 ---collObj
 function exports:collidesWithGrid(ent)
-	return exports.collidesWithCollisionObject(ent) or ent:CollidesWithGrid()
+	return exports:collidesWithCollisionObject(ent) or ent:CollidesWithGrid()
 end
 
 ---checks whether the entity will collide with collObjs if it's at a certain 
 ---position
 function exports:positionCollidesWithCollisionObject(pos, ent)
-	if not exports.areCollisionObjectsPresent() then
+	if not exports:areCollisionObjectsPresent() then
 		return false
 	end
 
-	local collisionObjects = exports.getCollisionObjects()
+	local collisionObjects = exports:getCollisionObjects()
 	local viableCollObjects = collisionObjects
 	if ent then
 		viableCollObjects = {}
 
-		for i=1, exports.getNumCollisionObjectIds() do
+		for i=1, exports:getNumCollisionObjectIds() do
 			local collObj = collisionObjects[i]
-			if collObj and exports.canCollideWithGrid(ent.GridCollisionClass, collObj.CollisionClass, ent.Type == EntityType.ENTITY_PLAYER) 
+			if collObj and exports:canCollideWithGrid(ent.GridCollisionClass, collObj.CollisionClass, ent.Type == EntityType.ENTITY_PLAYER) 
 			and (not collObj.Conditions or collObj.Conditions(collObj, ent)) then
 				table.insert(viableCollObjects, collObj)
 			end
@@ -235,13 +235,13 @@ end
 -- return value 1: distance. -1 if no collision object is found
 -- return value 2: nearest collObj. nil if no collision object is found
 function exports:distanceFromNearestCollisionObject(pos)
-	if not exports.areCollisionObjectsPresent() then
+	if not exports:areCollisionObjectsPresent() then
 		return -1, nil
 	end
 	
-	local collisionObjects = exports.getCollisionObjects()
+	local collisionObjects = exports:getCollisionObjects()
 	local distance, nearestCollObj
-	for i=1, exports.getNumCollisionObjectIds() do
+	for i=1, exports:getNumCollisionObjectIds() do
 		local collObj = collisionObjects[i]
 		if collObj then
 			local closestPoint = Vector(math.min(math.max(pos.X, collObj.Vec1.X), collObj.Vec2.X), math.min(math.max(pos.Y, collObj.Vec1.Y), collObj.Vec2.Y))
@@ -265,15 +265,15 @@ local function clamp(value, min, max)
 end
 
 function exports:entityGridCollisionUpdate(ent)
-	if exports.areCollisionObjectsPresent() then
+	if exports:areCollisionObjectsPresent() then
 		local data = ent:GetData()
 		data.CollidesWithCollisionObject = false
-		local collisionObjects = exports.getCollisionObjects()
+		local collisionObjects = exports:getCollisionObjects()
 		local viableCollObjects = {}
 		
-		for i=1, exports.getNumCollisionObjectIds() do
+		for i=1, exports:getNumCollisionObjectIds() do
 			local collObj = collisionObjects[i]
-			if collObj and exports.canCollideWithGrid(ent.GridCollisionClass, collObj.CollisionClass, ent.Type == EntityType.ENTITY_PLAYER) 
+			if collObj and exports:canCollideWithGrid(ent.GridCollisionClass, collObj.CollisionClass, ent.Type == EntityType.ENTITY_PLAYER) 
 			and (not collObj.Conditions or collObj:Conditions(collObj, ent)) then
 				table.insert(viableCollObjects, collObj)
 			end
